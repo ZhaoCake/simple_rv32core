@@ -11,15 +11,15 @@ module regfile_tb;
 
     // 例化寄存器堆
     regfile u_regfile (
-        .clk      (clk),
-        .rst_n    (rst_n),
-        .rs1_addr (rs1_addr),
-        .rs1_data (rs1_data),
-        .rs2_addr (rs2_addr),
-        .rs2_data (rs2_data),
-        .we       (we),
-        .rd_addr  (rd_addr),
-        .rd_data  (rd_data)
+        .clk       (clk),
+        .rst_n     (rst_n),
+        .rs1_addr  (rs1_addr),
+        .rs2_addr  (rs2_addr),
+        .rd_addr   (rd_addr),
+        .rd_data   (rd_data),
+        .reg_write (we),
+        .rs1_data  (rs1_data),
+        .rs2_data  (rs2_data)
     );
 
     // 时钟生成
