@@ -76,30 +76,30 @@ module top_tb;
             $display("\nTime=%0t Checking processor state", $time);
 
             // 检查寄存器值
-            if (u_riscv_top.u_regfile.regs[1] !== 32'h1)
-                $display("ERROR: x1 should be 1, got %0d", 
+            if (u_riscv_top.u_regfile.regs[1] !== 32'h5)
+                $display("ERROR: x1 should be 5, got %0d", 
                          u_riscv_top.u_regfile.regs[1]);
 
-            if (u_riscv_top.u_regfile.regs[2] !== 32'h2)
-                $display("ERROR: x2 should be 2, got %0d",
+            if (u_riscv_top.u_regfile.regs[2] !== 32'h3)
+                $display("ERROR: x2 should be 3, got %0d",
                          u_riscv_top.u_regfile.regs[2]);
 
-            if (u_riscv_top.u_regfile.regs[3] !== 32'h3)
-                $display("ERROR: x3 should be 3, got %0d",
+            if (u_riscv_top.u_regfile.regs[3] !== 32'h2)
+                $display("ERROR: x3 should be 2, got %0d",
                          u_riscv_top.u_regfile.regs[3]);
 
-            if (u_riscv_top.u_regfile.regs[4] !== 32'h3)
-                $display("ERROR: x4 should be 3, got %0d",
+            if (u_riscv_top.u_regfile.regs[4] !== 32'h2)
+                $display("ERROR: x4 should be 2, got %0d",
                          u_riscv_top.u_regfile.regs[4]);
 
             // 检查内存值
-            if ({u_data_mem.mem[3], u_data_mem.mem[2],
-                 u_data_mem.mem[1], u_data_mem.mem[0]} !== 32'h3)
-                $display("ERROR: mem[0] should be 3, got %0d",
-                         {u_data_mem.mem[3],
-                          u_data_mem.mem[2],
-                          u_data_mem.mem[1],
-                          u_data_mem.mem[0]});
+            if ({u_data_mem.mem[7], u_data_mem.mem[6],
+                 u_data_mem.mem[5], u_data_mem.mem[4]} !== 32'h2)
+                $display("ERROR: mem[4] should be 2, got %0d",
+                         {u_data_mem.mem[7],
+                          u_data_mem.mem[6],
+                          u_data_mem.mem[5],
+                          u_data_mem.mem[4]});
 
             $display("Test completed");
         end

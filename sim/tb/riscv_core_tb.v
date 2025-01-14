@@ -71,11 +71,11 @@ module riscv_core_tb;
         
         // 等待指令执行完成
         // 测试程序：
-        // addi x1, x0, 1    // x1 = 1
-        // addi x2, x0, 2    // x2 = 2
-        // add  x3, x1, x2   // x3 = x1 + x2 (数据相关)
-        // sw   x3, 0(x0)    // mem[0] = x3
-        // lw   x4, 0(x0)    // x4 = mem[0] (数据相关)
+// addi x1, x0, 5    // x1 = 5
+// addi x2, x0, 3    // x2 = 3
+// sub  x3, x1, x2   // x3 = x1 - x2 = 2
+// sw   x3, 4(x0)    // mem[4] = x3
+// lw   x4, 4(x0)    // x4 = mem[4]
         repeat(20) @(posedge clk);
         
         // 检查结果
@@ -97,20 +97,20 @@ module riscv_core_tb;
             $display("\nTime=%0t Checking processor state", $time);
             
             // 检查寄存器值
-            if (u_riscv_top.u_regfile.regs[1] !== 32'h1)
-                $display("ERROR: x1 should be 1, got %0d", 
+            if (u_riscv_top.u_regfile.regs[1] !== 32'h5)
+                $display("ERROR: x1 should be 5, got %0d", 
                          u_riscv_top.u_regfile.regs[1]);
                          
-            if (u_riscv_top.u_regfile.regs[2] !== 32'h2)
-                $display("ERROR: x2 should be 2, got %0d",
+            if (u_riscv_top.u_regfile.regs[2] !== 32'h3)
+                $display("ERROR: x2 should be 3, got %0d",
                          u_riscv_top.u_regfile.regs[2]);
                          
-            if (u_riscv_top.u_regfile.regs[3] !== 32'h3)
-                $display("ERROR: x3 should be 3, got %0d",
+            if (u_riscv_top.u_regfile.regs[3] !== 32'h2)
+                $display("ERROR: x3 should be 2, got %0d",
                          u_riscv_top.u_regfile.regs[3]);
                          
-            if (u_riscv_top.u_regfile.regs[4] !== 32'h3)
-                $display("ERROR: x4 should be 3, got %0d",
+            if (u_riscv_top.u_regfile.regs[4] !== 32'h2)
+                $display("ERROR: x4 should be 2, got %0d",
                          u_riscv_top.u_regfile.regs[4]);
                          
             // 检查内存值
