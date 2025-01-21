@@ -44,7 +44,9 @@ module decode (
     output reg  [31:0] imm,          // 立即数
     output reg         branch,        // 分支指令标志
     output reg         jump,          // 跳转指令标志
-    output wire [31:0] branch_target  // 分支/跳转目标地址
+    output wire [31:0] branch_target, // 分支/跳转目标地址
+    output reg         ecall,         // ECALL指令标志
+    output reg         ebreak         // EBREAK指令标志
 );
 
     /**************** 指令解码 ****************/
@@ -122,6 +124,8 @@ module decode (
         reg_src_sel  = REG_SRC_ALU;
         branch       = 1'b0;
         jump         = 1'b0;
+        ecall        = 1'b0;
+        ebreak       = 1'b0;
         
         case (1'b1)
             is_r_type: begin
@@ -144,6 +148,14 @@ module decode (
                 if (opcode == 7'b0000011) begin  // 加载指令
                     mem_read     = 1'b1;
                     reg_src_sel  = REG_SRC_MEM;
+                    case (funct3)
+                        3'b000: mem_size = 2'b00;  // LB
+                        3'b001: mem_size = 2'b01;  // LH
+                        3'b010: mem_size = 2'b10;  // LW
+                        3'b100: mem_size = 2'b00;  // LBU
+                        3'b101: mem_size = 2'b01;  // LHU
+                        default: mem_size = 2'b10;
+                    endcase
                 end else begin                   // 算术指令
                     case (funct3)
                         3'b000:  alu_op = ALU_ADD;
@@ -161,6 +173,12 @@ module decode (
             is_s_type: begin
                 mem_write    = 1'b1;
                 alu_src2_sel = ALU_SRC_IMM;
+                case (funct3)
+                    3'b000: mem_size = 2'b00;  // SB
+                    3'b001: mem_size = 2'b01;  // SH
+                    3'b010: mem_size = 2'b10;  // SW
+                    default: mem_size = 2'b10;
+                endcase
             end
             
             is_b_type: begin
@@ -190,6 +208,17 @@ module decode (
                     alu_src1_sel = ALU_SRC_PC;
                     alu_src2_sel = ALU_SRC_IMM;
                 end
+            end
+            
+            7'b1110011: begin  // System
+                case (funct3)
+                    3'b000: begin
+                        case (inst)
+                            32'h00000073: ecall = 1'b1;   // ECALL
+                            32'h00100073: ebreak = 1'b1;  // EBREAK
+                        endcase
+                    end
+                endcase
             end
         endcase
     end

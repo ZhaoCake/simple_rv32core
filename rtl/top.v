@@ -21,7 +21,8 @@ module riscv_top (
     output wire [31:0] data_wdata,   // 写数据
     output wire [ 3:0] data_wmask,   // 写掩码
     output wire        data_wen,     // 写使能
-    input  wire [31:0] data_rdata    // 读数据
+    input  wire [31:0] data_rdata,   // 读数据
+    output wire [ 1:0] data_size     // 访问大小：00=byte, 01=half, 10=word
 );
 
     /**************** IF阶段信号 ****************/
@@ -308,5 +309,41 @@ module riscv_top (
         .id_flush      (id_flush),
         .ex_flush      (ex_flush)
     );
+
+    /**************** 内存访问控制 ****************/
+    // 生成写掩码
+    reg [3:0] wmask;
+    always @(*) begin
+        case (ex_mem_size)
+            2'b00: wmask = 4'b0001 << data_addr[1:0];  // SB
+            2'b01: wmask = 4'b0011 << {data_addr[1], 1'b0};  // SH
+            2'b10: wmask = 4'b1111;  // SW
+            default: wmask = 4'b0000;
+        endcase
+    end
+    assign data_wmask = ex_mem_mem_write ? wmask : 4'b0000;
+
+    // 处理非对齐访问的读数据
+    reg [31:0] aligned_rdata;
+    always @(*) begin
+        case (mem_wb_size)
+            2'b00: begin  // LB/LBU
+                case (mem_wb_addr[1:0])
+                    2'b00: aligned_rdata = {{24{mem_wb_signed & data_rdata[7]}}, data_rdata[7:0]};
+                    2'b01: aligned_rdata = {{24{mem_wb_signed & data_rdata[15]}}, data_rdata[15:8]};
+                    2'b10: aligned_rdata = {{24{mem_wb_signed & data_rdata[23]}}, data_rdata[23:16]};
+                    2'b11: aligned_rdata = {{24{mem_wb_signed & data_rdata[31]}}, data_rdata[31:24]};
+                endcase
+            end
+            2'b01: begin  // LH/LHU
+                case (mem_wb_addr[1])
+                    1'b0: aligned_rdata = {{16{mem_wb_signed & data_rdata[15]}}, data_rdata[15:0]};
+                    1'b1: aligned_rdata = {{16{mem_wb_signed & data_rdata[31]}}, data_rdata[31:16]};
+                endcase
+            end
+            2'b10: aligned_rdata = data_rdata;  // LW
+            default: aligned_rdata = data_rdata;
+        endcase
+    end
 
 endmodule 

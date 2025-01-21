@@ -92,17 +92,17 @@ module execute (
     // ALU运算结果
     always @(*) begin
         case (alu_op)
-            ALU_ADD:  alu_result = alu_src1 + alu_src2;
-            ALU_SUB:  alu_result = alu_src1 - alu_src2;
-            ALU_AND:  alu_result = alu_src1 & alu_src2;
-            ALU_OR:   alu_result = alu_src1 | alu_src2;
-            ALU_XOR:  alu_result = alu_src1 ^ alu_src2;
-            ALU_SLL:  alu_result = alu_src1 << shamt;
-            ALU_SRL:  alu_result = alu_src1 >> shamt;
-            ALU_SRA:  alu_result = $signed(alu_src1) >>> shamt;
+            4'b0000: alu_result = alu_src1 + alu_src2;  // ADD
+            4'b0001: alu_result = alu_src1 - alu_src2;  // SUB
+            4'b0010: alu_result = alu_src1 & alu_src2;  // AND
+            4'b0011: alu_result = alu_src1 | alu_src2;  // OR
+            4'b0100: alu_result = alu_src1 ^ alu_src2;  // XOR
+            4'b0101: alu_result = alu_src1 << shamt;  // SLL
+            4'b0110: alu_result = alu_src1 >> shamt;  // SRL
+            4'b0111: alu_result = $signed(alu_src1) >>> shamt;  // SRA
             ALU_SLT:  alu_result = {31'b0, $signed(alu_src1) < $signed(alu_src2)};
             ALU_SLTU: alu_result = {31'b0, alu_src1 < alu_src2};
-            default:  alu_result = alu_src1 + alu_src2;
+            default:  alu_result = 32'h0;
         endcase
     end
     
